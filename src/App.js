@@ -1,11 +1,12 @@
 import React, { Component } from "react";
-import axios from "axios";
+import axios from "axios"
+import { Search }  from "./components"
+
 class App extends Component {
   state = {
     title: "",
     body: "",
     posts: [],
-    search: "",
   };
 
   componentDidMount = () => {
@@ -17,7 +18,6 @@ class App extends Component {
       .get("/api")
       .then((response) => {
         const data = response.data;
-        console.log("Posts Recieved");
         this.setState({ posts: data });
       })
       .catch(() => {
@@ -25,20 +25,16 @@ class App extends Component {
       });
   };
 
+  searchBlogsUpdate = (posts) => {
+    this.setState({posts: posts})
+  }
+
   handleChange = ({ target }) => {
     const { name, value } = target;
     this.setState({ [name]: value });
   };
 
-  handleSearch = ({ target }) => {
-    const searchBlog = target.value;
-    this.setState({ search: searchBlog });
-    this.state.posts.filter((post) => {
-      if (searchBlog == post.title) {
-      }
-    });
-  };
-
+  
   handleSubmit = (event) => {
     event.preventDefault();
     const payload = {
@@ -99,13 +95,7 @@ class App extends Component {
           </div>
           <button>Submit</button>
         </form>
-        <input
-          name="searchBar"
-          type="text"
-          placeholder="Search a blog..."
-          value={this.state.search}
-          onChange={this.handleSearch}
-        />
+         <Search searchBlogsUpdate={this.searchBlogsUpdate}/>
         <div>{this.displayBlogPosts(this.state.posts)}</div>
       </div>
     );
