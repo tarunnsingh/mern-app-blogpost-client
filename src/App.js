@@ -1,6 +1,8 @@
 import React, { Component } from "react";
-import axios from "axios"
-import { Search }  from "./components"
+import axios from "axios";
+import { Search } from "./components";
+import styles from "./App.module.css";
+import cx from "classnames";
 
 class App extends Component {
   state = {
@@ -20,21 +22,20 @@ class App extends Component {
         const data = response.data;
         this.setState({ posts: data });
       })
-      .catch(() => {
-        console.log("Posts Recieved");
+      .catch((error) => {
+        console.error("Posts Not Recieved", error);
       });
   };
 
   searchBlogsUpdate = (posts) => {
-    this.setState({posts: posts})
-  }
+    this.setState({ posts: posts });
+  };
 
   handleChange = ({ target }) => {
     const { name, value } = target;
     this.setState({ [name]: value });
   };
 
-  
   handleSubmit = (event) => {
     event.preventDefault();
     const payload = {
@@ -47,7 +48,7 @@ class App extends Component {
       data: payload,
     })
       .then((data) => {
-        console.log("Data Sent to Server: ", data.data);
+        console.log("Post Sent to Server: ", data.data);
         this.resetInput();
         this.getBlogPosts();
       })
@@ -65,39 +66,58 @@ class App extends Component {
 
   displayBlogPosts = (posts) => {
     if (!posts.length) return null;
-
     return posts.map((post, idx) => (
-      <div key={idx}>
+      <div key={idx} className={styles.posts}>
         <h2>{post.title}</h2>
         <p>{post.body}</p>
+        <button className={styles.buttonLike}>Like</button>
       </div>
     ));
   };
 
   render() {
     console.log("State: ", this.state);
+
     return (
       <div>
-        <h2>Welcome to the App</h2>
+      
+      <div className={styles.conatiner}>
+        <span>Lets post</span>
         <form onSubmit={this.handleSubmit}>
-          <div className="form-input">
-            <input name="title" type="text" placeholder="Title" value={this.state.title} onChange={this.handleChange} />
+          <div className={styles.internaldiv}>
+            <fieldset>
+              <div className={styles.inputcontainer}>
+                <label htmlFor="title">Title</label>
+                <input
+                  name="title"
+                  type="text"
+                  placeholder="Enter Title..."
+                  value={this.state.title}
+                  onChange={this.handleChange}
+                />
+              </div>
+              <div className={styles.inputcontainer}>
+                <label htmlFor="body">Body</label>
+                <textarea
+                  placeholder="Type here..."
+                  name="body"
+                  value={this.state.body}
+                  cols="30"
+                  rows="10"
+                  onChange={this.handleChange}
+                ></textarea>
+              </div>
+              <div className={cx(styles.submitcontainer, styles.inputcontainer)}>
+                <button className={styles.formSubmit}>Submit</button>
+              </div>
+            </fieldset>
           </div>
-          <div className="form-input">
-            <textarea
-              placeholder="Body"
-              value={this.state.body}
-              name="body"
-              cols="30"
-              rows="10"
-              onChange={this.handleChange}
-            ></textarea>
-          </div>
-          <button>Submit</button>
         </form>
-         <Search searchBlogsUpdate={this.searchBlogsUpdate}/>
-        <div>{this.displayBlogPosts(this.state.posts)}</div>
-      </div>
+       
+        </div>
+        <Search searchBlogsUpdate={this.searchBlogsUpdate} />
+        <div className={styles.displayPosts}>{this.displayBlogPosts(this.state.posts)}</div>
+    </div>
     );
   }
 }
