@@ -4,11 +4,39 @@ class App extends Component {
   state = {
     title: "",
     body: "",
+    posts: [],
+    search: "",
+  };
+
+  componentDidMount = () => {
+    this.getBlogPosts();
+  };
+
+  getBlogPosts = () => {
+    axios
+      .get("/api")
+      .then((response) => {
+        const data = response.data;
+        console.log("Posts Recieved");
+        this.setState({ posts: data });
+      })
+      .catch(() => {
+        console.log("Posts Recieved");
+      });
   };
 
   handleChange = ({ target }) => {
     const { name, value } = target;
     this.setState({ [name]: value });
+  };
+
+  handleSearch = ({ target }) => {
+    const searchBlog = target.value;
+    this.setState({ search: searchBlog });
+    this.state.posts.filter((post) => {
+      if (searchBlog == post.title) {
+      }
+    });
   };
 
   handleSubmit = (event) => {
@@ -24,7 +52,8 @@ class App extends Component {
     })
       .then((data) => {
         console.log("Data Sent to Server: ", data.data);
-        this.resetInput()
+        this.resetInput();
+        this.getBlogPosts();
       })
       .catch((error) => {
         console.error("ERROR", error);
@@ -33,10 +62,21 @@ class App extends Component {
 
   resetInput = () => {
     this.setState({
-      title: '',
-      body: ''
-    })
-  }
+      title: "",
+      body: "",
+    });
+  };
+
+  displayBlogPosts = (posts) => {
+    if (!posts.length) return null;
+
+    return posts.map((post, idx) => (
+      <div key={idx}>
+        <h2>{post.title}</h2>
+        <p>{post.body}</p>
+      </div>
+    ));
+  };
 
   render() {
     console.log("State: ", this.state);
@@ -59,6 +99,14 @@ class App extends Component {
           </div>
           <button>Submit</button>
         </form>
+        <input
+          name="searchBar"
+          type="text"
+          placeholder="Search a blog..."
+          value={this.state.search}
+          onChange={this.handleSearch}
+        />
+        <div>{this.displayBlogPosts(this.state.posts)}</div>
       </div>
     );
   }
